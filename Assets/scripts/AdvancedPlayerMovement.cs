@@ -40,24 +40,12 @@ public class AdvancedPlayerMovement : MonoBehaviour
         anim = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
     }
-
-    // Update is called once per frame
-    void FixedUpdate()
+    
+    void Update()
     {
-        grounded = Physics2D.OverlapCircle(groundCheckPoint.position, groundCheckRadius, whatIsGround);
-        
-        float horizontalInput = Input.GetAxisRaw("Horizontal");
-        body.velocity = new Vector2(horizontalInput*speed, body.velocity.y);
-        anim.SetBool("walk", horizontalInput !=0);
-
-        if(horizontalInput != 0 && grounded)
-        {
-            PlaySound(footstepSound);
-        }
-
         if(Input.GetKeyDown(KeyCode.Space)&& grounded)
         {
-             Jump();
+            Jump();
             canDoubleJump = true; 
              
         }
@@ -66,7 +54,22 @@ public class AdvancedPlayerMovement : MonoBehaviour
             Jump();
             canDoubleJump = false;
         }
+    }
+    // Update is called once per frame
+    void FixedUpdate()
+    {
+        grounded = Physics2D.OverlapCircle(groundCheckPoint.position, groundCheckRadius, whatIsGround);
+        
+        float horizontalInput = Input.GetAxisRaw("Horizontal");
+        body.velocity = new Vector2(horizontalInput*speed, body.velocity.y);
+        anim.SetBool("Walk", horizontalInput !=0);
 
+        if(horizontalInput != 0 && grounded)
+        {
+            PlaySound(footstepSound);
+        }
+
+        
         if((horizontalInput>0&& !facingRight)||(horizontalInput<0&&facingRight))
         {
             Flip();
@@ -97,6 +100,7 @@ public class AdvancedPlayerMovement : MonoBehaviour
         }
         
     }
+
     private void PlaySound(AudioClip clip)
     {
         audioSource.clip = clip;
@@ -112,7 +116,7 @@ public class AdvancedPlayerMovement : MonoBehaviour
     private void Jump()
     {
         body.velocity = new Vector2(body.velocity.x, jumpHeight);
-        anim.SetTrigger("jump");
+        anim.SetTrigger("Jump");
         grounded = false;
         PlaySound(jumpSound);
     }
