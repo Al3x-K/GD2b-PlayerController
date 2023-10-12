@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
@@ -18,6 +17,10 @@ public class AdvancedPlayerMovement : MonoBehaviour
     public AudioClip jumpSound; 
     public AudioClip dashSound; 
     public AudioClip footstepSound; 
+
+    [SerializeField] private int attackDamage = 1;
+    [SerializeField] private float attackRange = 2;
+    public LayerMask enemyLayers;
 
     private Rigidbody2D body; 
     private Animator anim; 
@@ -88,7 +91,16 @@ public class AdvancedPlayerMovement : MonoBehaviour
             }
         }
 
+        if(Input.GetKeyDown(KeyCode.F))
+        {
+            Attack();
+        }
         
+    }
+    private void PlaySound(AudioClip clip)
+    {
+        audioSource.clip = clip;
+        audioSource.Play();
     }
     private void Flip()
     {
@@ -115,11 +127,24 @@ public class AdvancedPlayerMovement : MonoBehaviour
         speed = originalSpeed; 
         isDashing = false; 
     }
-    private void PlaySound(AudioClip clip)
+    void Attack()
     {
-        audioSource.clip = clip; 
-        audioSource.Play();
-    }
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, attackRange, enemyLayers);
+        foreach (Collider2D enemy in hitEnemies)
+        {
+            EnemyController enemyController = enemy.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                Debug.Log("The player took damage");
+                enemyController.TakeDamage(attackDamage);
+                
+            }
 
-    
+        }
+    }
+    void OnDrawGizmosSelected() 
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange); 
+    }
 }
